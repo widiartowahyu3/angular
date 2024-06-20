@@ -18,7 +18,7 @@ import { ButtonModule } from 'primeng/button';
     ButtonModule,
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent {
   constructor(private productService: ProductsService) {}

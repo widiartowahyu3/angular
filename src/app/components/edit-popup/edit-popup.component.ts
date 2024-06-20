@@ -3,7 +3,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { Product } from '../../../types';
 import { RatingModule } from 'primeng/rating';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
@@ -18,11 +24,13 @@ import { ButtonModule } from 'primeng/button';
     ReactiveFormsModule,
   ],
   templateUrl: './edit-popup.component.html',
-  styleUrl: './edit-popup.component.css',
+  styleUrl: './edit-popup.component.scss',
 })
 export class EditPopupComponent {
+  constructor(private formBuilder: FormBuilder) {}
+
   @Input() display: boolean = false;
-  @Output() confirm = new EventEmitter<Product>();
+  @Output() displayChange = new EventEmitter<boolean>();
   @Input() header!: string;
 
   @Input() product: Product = {
@@ -32,11 +40,45 @@ export class EditPopupComponent {
     rating: 0,
   };
 
+  @Output() confirm = new EventEmitter<Product>();
+
+  specialCharValidator(): ValidatorFn {
+    return (control) => {
+      const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(
+        control.value
+      );
+
+      return hasSpecialChar ? { hasSpecialChar: true } : null;
+    };
+  }
+
+  productForm = this.formBuilder.group({
+    name: ['', [Validators.required, this.specialCharValidator()]],
+    image: [''],
+    price: ['', [Validators.required]],
+    rating: [0],
+  });
+
+  ngOnChanges() {
+    this.productForm.patchValue(this.product);
+  }
+
   onConfirm() {
-    this.confirm.emit(this.product);
+    const { name, image, price, rating } = this.productForm.value;
+
+    this.confirm.emit({
+      name: name || '',
+      image: image || '',
+      price: price || '',
+      rating: rating || 0,
+    });
+
+    this.display = false;
+    this.displayChange.emit(this.display);
   }
 
   onCancel() {
     this.display = false;
+    this.displayChange.emit(this.display);
   }
 }

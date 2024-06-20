@@ -1,4 +1,12 @@
 <div class="header wrapper row full-center">
   <img src="assets/images/logokuu.png" alt="logo images" class="logo" />
-  <!-- <p>COBAIN AJA</p> -->
+  <div class="row gap-1">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      >Home</a
+    >
+    <a routerLink="/about-us" routerLinkActive="active">About</a>
+  </div>
 </div>
